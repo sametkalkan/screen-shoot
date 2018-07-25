@@ -18,6 +18,7 @@ class App(QMainWindow):
 
 
     def initUI(self):
+
         # pixmap = QPixmap("3.jpg")
         # self.l = Label(self, pixmap)
 

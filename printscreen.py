@@ -3,34 +3,21 @@ import sys
 
 from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QLineEdit, QLabel, QGraphicsScene, QGraphicsView, \
     QGraphicsItem, QMainWindow, QFileDialog, QVBoxLayout, QMenu
-from PyQt5.QtGui import QIcon, QPixmap, QPainter, QBrush, QPen, QMouseEvent, QImage, QContextMenuEvent, QColor, QCursor
-from PyQt5.QtCore import pyqtSlot, Qt, QDir, QRect, QBuffer, QByteArray, QDate, QTime
+from PyQt5.QtGui import QIcon, QPixmap, QPainter, QBrush, QPen, QMouseEvent, QImage, QContextMenuEvent, QColor, QCursor, \
+    QClipboard
+from PyQt5.QtCore import pyqtSlot, Qt, QDir, QRect, QBuffer, QByteArray, QDate, QTime, QMimeData
 from PyQt5 import QtWidgets
 
-from PIL import Image
-import win32clipboard
-from io import BytesIO
-import os
+
+
 
 def to_clipboard(pixmap):
-    pixmap.save("temp.jpg")
-    img = QImage("temp.jpg")
-    buffer = QBuffer()
-    buffer.open(QBuffer.ReadWrite)
-    img.save(buffer, "JPG")
-    img = Image.open(io.BytesIO(buffer.data()))
-    ##img = Image.open("2.jpg")
-    output = BytesIO()
-    img.convert("RGB").save(output, "BMP")
-    data = output.getvalue()[14:]
-    output.close()
+    cb = QApplication.clipboard()
 
-    win32clipboard.OpenClipboard()
-    win32clipboard.EmptyClipboard()
-    win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
-    win32clipboard.CloseClipboard()
-
-    os.remove("temp.jpg")
+    #cb.setText("23423432", cb.Clipboard)
+    cb.setImage(pixmap.toImage(), 0)
+    # print(cb.text())
+    #cb.deleteLater()
 
 class SelectableObject(QWidget):
     def __init__(self, parent=None, pixmap=None):
@@ -105,6 +92,7 @@ class SelectableObject(QWidget):
         time = QTime().currentTime().toString("hh-mm-ss")
         img_name = date + "_" + time + ".jpg"
         fileName = QFileDialog.getSaveFileName(self, 'Save File', img_name, "Image Format (*.jpg)")
+        print(fileName)
         cropped.save(fileName[0])
 
     def to_clipboard(self):
@@ -127,7 +115,7 @@ class SelectableObject(QWidget):
             self.parent.close_screen()
         elif action == to_clipboard:
             self.to_clipboard()
-            self.parent.close_screen()
+            #self.parent.close_screen()
         elif action == save_and_buffer:
             self.save()
             self.to_clipboard()
@@ -138,8 +126,9 @@ class SelectableObject(QWidget):
 
 class PrintScreen(QMainWindow):
 
-    def __init__(self, parent, pixmap):
-        super(PrintScreen, self).__init__(parent)
+    def __init__(self, pixmap):
+        super().__init__()
+        #super(PrintScreen, self).__init__(parent)
 
         self.setCursor(QCursor(Qt.CrossCursor)) # changes the cursor to cross(plus sign)
 
@@ -154,7 +143,8 @@ class PrintScreen(QMainWindow):
 
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Escape:
-            self.close()
+            self.close_screen()
+
 
     def mousePressEvent(self, e):
         self.close()
@@ -165,7 +155,7 @@ class PrintScreen(QMainWindow):
         print(e.pos())
 
     def close_screen(self):
-        self.close()
+        self.showMinimized()
 
 
 if __name__ == '__main__':
@@ -173,7 +163,7 @@ if __name__ == '__main__':
 
     img = QApplication.primaryScreen().grabWindow(0)
     to_clipboard(img)
-    PrintScreen(None, img)
+    PrintScreen(img)
 
     sys.exit(app.exec_())
 

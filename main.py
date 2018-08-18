@@ -5,9 +5,9 @@ from PyQt5.QtGui import QIcon, QPixmap, QPainter, QBrush, QPen, QMouseEvent, QIm
 from PyQt5.QtCore import pyqtSlot, Qt, QDir, QRect
 from PyQt5 import QtWidgets
 
-from printscreen import PrintScreen
+#from printscreen import PrintScreen
 
-import keyboard
+#import keyboard
 
 
 
@@ -36,14 +36,10 @@ def open_print_screen():
     PrintScreen(img)
 
 
-
 if __name__ == '__main__':
-    #keyboard.add_hotkey("alt+x", open_print_screen)
 
     app = QApplication(sys.argv)
     ex = App()
-    #open_print_screen()
-    # keyboard.wait('esc')
     sys.exit(app.exec_())
 
 
